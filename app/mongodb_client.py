@@ -25,3 +25,24 @@ class MongoDBClient:
     def clearDb(self,database):
         self.client.drop_database(database)
 
+    #Mètode per escriure les dades a la DB.
+    def set_data(self, data):
+        if self.collection:
+            result = self.collection.insert_one(data)
+            return result.inserted_id
+        else:
+            raise Exception("No collection selected. Please select a collection using getCollection method.")
+    
+    #Mètode per obtenir les dades de la DB.
+    def get_data(self, query=None):
+        if self.collection:
+            if query:
+                result = self.collection.find(query)
+            else:
+                result = self.collection.find()
+            return [data for data in result]
+        else:
+            raise Exception("No collection selected. Please select a collection using getCollection method.")
+    
+
+
