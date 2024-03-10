@@ -20,13 +20,50 @@ def create_sensor(db: Session, sensor: schemas.SensorCreate) -> models.Sensor:
     db.refresh(db_sensor)
     return db_sensor
 
-def record_data(redis: Session, sensor_id: int, data: schemas.SensorData) -> schemas.Sensor:
-    db_sensordata = data
-    return db_sensordata
+def record_data(redis: Session, sensor_id: int, data: schemas.SensorData, sensor: models.Sensor) -> schemas.Sensor:
+    sensor_key_ls = f"{sensor_id}:last_seen"
+    sensor_key_temp = f"{sensor_id}:temperature"
+    sensor_key_humi = f"{sensor_id}:humidity"
+    sensor_key_bl = f"{sensor_id}:battery_level"
 
-def get_data(redis: Session, sensor_id: int, data: schemas.SensorData) -> schemas.Sensor:
-    db_sensordata = data
-    return db_sensordata
+    db_sensor = schemas.Sensor(
+        id=sensor_id,
+        name=sensor.name,
+        latitude=sensor.latitude,
+        longitude=sensor.longitude,
+        joined_at=str(sensor.joined_at),
+        last_seen=data.last_seen, 
+        temperature=data.temperature, 
+        humidity=data.humidity, 
+        battery_level=data.battery_level
+    )
+    
+    redis.set(sensor_key_ls, data.last_seen)
+    redis.set(sensor_key_temp, data.temperature)
+    redis.set(sensor_key_humi, data.humidity)
+    redis.set(sensor_key_bl, data.battery_level)
+    
+    return db_sensor
+
+def get_data(redis: Session, sensor_id: int, sensor: models.Sensor) -> schemas.Sensor:
+    sensor_ls = redis.get(f"{sensor_id}:last_seen")
+    sensor_temp = redis.get(f"{sensor_id}:temperature")
+    sensor_humi = redis.get(f"{sensor_id}:humidity")
+    sensor_bl = redis.get(f"{sensor_id}:battery_level")
+
+    db_sensor = schemas.Sensor(
+        id=sensor_id,
+        name=sensor.name,
+        latitude=sensor.latitude,
+        longitude=sensor.longitude,
+        joined_at=str(sensor.joined_at),
+        last_seen=sensor_ls, 
+        temperature=sensor_temp, 
+        humidity=sensor_humi, 
+        battery_level=sensor_bl
+    )
+    
+    return db_sensor
 
 def delete_sensor(db: Session, sensor_id: int):
     db_sensor = db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()

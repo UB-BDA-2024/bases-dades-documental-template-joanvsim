@@ -11,8 +11,14 @@ class MongoDBClient:
     def close(self):
         self.client.close()
     
+    
+    '''
     def ping(self):
         return self.client.db_name.command('ping')
+    '''
+    
+    def ping(self):
+        return self._client.ping()
     
     def getDatabase(self, database):
         self.database = self.client[database]
@@ -25,4 +31,9 @@ class MongoDBClient:
     def clearDb(self,database):
         self.client.drop_database(database)
 
+    def set(self, key, value):
+        self._client.set(key, value)
+
+    def get(self, key):
+        return self._client.get(key)
 
