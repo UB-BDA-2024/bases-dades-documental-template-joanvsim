@@ -45,12 +45,10 @@ def get_sensors_near(latitude: float, longitude: float, db: Session = Depends(ge
     raise HTTPException(status_code=404, detail="Not implemented")
     #return repository.get_sensors_near(mongodb=mongodb_client, latitude=latitude, longitude=longitude)
 
-
 # 🙋🏽‍♀️ Add here the route to get all sensors
 @router.get("")
 def get_sensors(db: Session = Depends(get_db)):
     return repository.get_sensors(db)
-
 
 # 🙋🏽‍♀️ Add here the route to create a sensor
 @router.post("")
