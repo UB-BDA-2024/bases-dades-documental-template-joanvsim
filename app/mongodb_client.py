@@ -5,15 +5,15 @@ class MongoDBClient:
         self.host = host
         self.port = port
         self.client = MongoClient(host, port)
-        self.database = None
-        self.collection = None
+        self.database = self.client["MongoDB_"]
+        self.collection = self.client["sensors"]
 
     def close(self):
         self.client.close()
     
     def ping(self):
         return self.client.db_name.command('ping')
-        
+    
     def getDatabase(self, database):
         self.database = self.client[database]
         return self.database
@@ -24,5 +24,3 @@ class MongoDBClient:
     
     def clearDb(self,database):
         self.client.drop_database(database)
-
-
