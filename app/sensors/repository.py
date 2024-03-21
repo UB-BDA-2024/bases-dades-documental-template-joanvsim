@@ -60,7 +60,7 @@ def get_data(redis: redis_client.RedisClient, sensor_id: int, db:Session) -> sch
 def get_sensors_near(mongodb_client: MongoDBClient,  db:Session, redis:redis_client.RedisClient,  latitude: float, longitude: float, radius: int):
     mongodb_client.getDatabase("MongoDB_")
     collection = mongodb_client.getCollection("sensors")
-    #enable geospatial queries
+
     collection.create_index([("location", "2dsphere")])
     nearby_sensors = list(collection.find(
         {
@@ -75,7 +75,7 @@ def get_sensors_near(mongodb_client: MongoDBClient,  db:Session, redis:redis_cli
         }
         }
     ))
-    print("Nearby are: ", nearby_sensors)
+    
     sensors = []
     for doc in nearby_sensors:
         doc["_id"] = str(doc["_id"])
